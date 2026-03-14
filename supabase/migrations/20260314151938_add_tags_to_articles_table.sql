@@ -1,0 +1,1 @@
+ALTER TABLE IF EXISTS public.articles ADD tags TEXT[] DEFAULT '{}';
