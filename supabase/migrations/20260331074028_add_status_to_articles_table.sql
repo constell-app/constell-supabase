@@ -1,0 +1,1 @@
+ALTER TABLE IF EXISTS public.articles ADD status TEXT DEFAULT 'processing';
