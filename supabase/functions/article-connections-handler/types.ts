@@ -4,6 +4,9 @@ import { Tables } from "$generated/database.types.ts";
 export type ArticleRow = Tables<"articles">;
 export type ArticleConnectionRow = Tables<"article_connections">;
 
+// Definitions of all article statuses
+export type ArticleStatus = "processing" | "completed" | "error";
+
 // Type definitions related to webhook payloads
 export type WebhookOperation = "INSERT" | "UPDATE" | "DELETE";
 

@@ -4,6 +4,7 @@ import { corsHeaders as defaultCorsHeaders } from "@supabase/supabase-js/cors";
 
 import type { Database } from "$generated/database.types.ts";
 import { ArticleSummary } from "./gemini.ts";
+import { ArticleStatus } from "./types.ts";
 
 export const corsHeaders = defaultCorsHeaders;
 
@@ -32,6 +33,26 @@ export async function updateArticle(
       summary: summary.summary,
       tags: summary.tags,
       embedding: embedding,
+    })
+    .eq("id", id);
+
+  if (updateError) {
+    throw updateError;
+  }
+}
+
+/**
+ * Update the status of the article record in the "articles" table.
+ *
+ * @param id An article ID to update the record in the "articles" table.
+ * @param status The new status of the article, which can be "processing", "completed", or "error".
+ * @throws - {@link PostgrestError} If the update operation fails, the error from Supabase will be thrown.
+ */
+export async function updateArticleStatus(id: string, status: ArticleStatus) {
+  const { error: updateError } = await adminClient
+    .from("articles")
+    .update({
+      status: status,
     })
     .eq("id", id);
 

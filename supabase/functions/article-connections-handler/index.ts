@@ -9,15 +9,19 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: supabase.corsHeaders });
   }
-  try {
-    const payload: ArticleWebhookPayload = await req.json();
 
+  const payload: ArticleWebhookPayload = await req.json();
+  const record = payload.record;
+
+  try {
     if (payload.type !== "INSERT") {
       // TODO: Respond with the right code for unused events (Unnecessary event but Supabase Webhook always sends the event to this function)
       return new Response();
     }
 
-    const record = payload.record;
+    if (!record || !record.url) {
+      throw new Error("Invalid record data: " + JSON.stringify(record));
+    }
 
     console.log("Received article record:", record);
 
@@ -59,6 +63,12 @@ Deno.serve(async (req) => {
     );
   } catch (error: unknown) {
     console.error("Error processing article:", error);
+
+    // Update the article status to "error" if the record ID is available
+    if (record && record.id) {
+      await supabase.updateArticleStatus(record.id, "error");
+    }
+
     return new Response(JSON.stringify({ "error": error }), {
       headers: { ...supabase.corsHeaders, "Content-Type": "application/json" },
       status: 500,
